@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<robot name="my_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+<xacro:include filename="$(find arm_description)/urdf/my_arm.gazebo" />
+<!-- Included URDF/XACRO Files -->
+<xacro:include filename="$(find arm_description)/urdf/materials.xacro" />
+
+<!-- Used for fixing robot to Gazebo 'base_link' -->
+<link name="world">
+</link>
+
+<!-- base_link -->
+<link name="base_link">
+    <inertial>
+      <mass value="2e-06"/>
+      <inertia ixx="1.1e-09" ixy="0" ixz="0" iyy="1.1e-09" iyz="0" izz="1.1e-09"/>
+    </inertial>
+
+</link>
+
+<!-- upperArm -->
+<xacro:property name="upperArmWidth" value="0.2" />
+<xacro:property name="upperArmLen" value="0.6" />
+<xacro:property name="upperArmMass" value="10" />
+<link name="upperArm">
+    <visual>
+        <geometry>
+            <cylinder radius="${upperArmWidth}" length="${upperArmLen}"/>
+        </geometry>
+        <material name="blue">
+            <color rgba="0 0 .8 1"/>
+        </material>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+    </visual>
+
+    <collision>
+        <geometry>
+            <cylinder radius="${upperArmWidth}" length="${upperArmLen}"/>
+        </geometry>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+    </collision>
+
+    <inertial>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+        <mass value="${upperArmMass}"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+    </inertial>
+
+</link>
+<!-- lowerArm -->
+<xacro:property name="lowerArmWidth" value=".15" />
+<xacro:property name="lowerArmLen" value=".6" />
+<xacro:property name="lowerArmMass" value="10" />
+<link name="lowerArm">
+    <visual>
+        <geometry>
+            <cylinder radius="${lowerArmWidth}" length="${lowerArmLen}"/>
+        </geometry>
+        <material name="blue">
+            <color rgba="0 0 .8 1"/>
+        </material>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+    </visual>
+
+    <collision>
+        <geometry>
+            <cylinder radius="${lowerArmWidth}" length="${lowerArmLen}"/>
+        </geometry>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+    </collision>
+
+    <inertial>
+        <origin xyz="0 0 ${upperArmLen/2}"/>
+        <mass value="${lowerArmMass}"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+    </inertial>
+
+</link>
+<!-- hand -->
+<xacro:property name="handRadius" value=".2" />
+<link name="hand">
+    <visual>
+        <geometry>
+            <sphere radius="${handRadius}"/>
+        </geometry>
+        <material name="blue">
+            <color rgba="0 0 .8 1"/>
+        </material>
+        <origin xyz="0 0 ${handRadius}"/>
+    </visual>
+
+    <collision>
+        <geometry>
+            <sphere radius="${handRadius}"/>
+        </geometry>
+        <origin xyz="0 0 ${handRadius}"/>
+    </collision>
+
+    <inertial>
+        <origin xyz="0 0 ${handRadius}"/>
+        <mass value="${lowerArmMass}"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+    </inertial>
+</link>
+<!-- Finger Macro -->
+<xacro:property name="fingerWidth" value=".05" />
+<xacro:property name="fingerLen" value=".3" />
+<xacro:property name="fingerHeight" value=".05" />
+<xacro:property name="fingerMass" value="10" />
+<xacro:property name="pi" value="3.1415926" />
+<xacro:macro name="finger" params="prefix reflect">
+    <link name="${prefix}_finger">
+        <visual>
+            <geometry>
+                <box size="${fingerLen} ${fingerWidth} ${fingerHeight}"/>
+            </geometry>
+            <origin xyz="0 ${reflect*handRadius/1.414} ${handRadius}" rpy="0 ${pi/2} ${reflect*pi/2} "/>
+            <material name="white">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="${fingerLen} ${fingerWidth} ${fingerHeight}"/>
+            </geometry>
+            <origin xyz="0 ${reflect*handRadius/1.414} ${handRadius}" rpy="0 ${pi/2} ${reflect*pi/2} "/>
+        </collision>
+
+        <inertial>
+            <origin xyz="0 ${reflect*handRadius/1.414} ${handRadius}" rpy="0 ${pi/2} ${reflect*pi/2} "/>
+            <mass value="${fingerMass}"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                     iyy="1.0" iyz="0.0"
+                     izz="1.0" />
+        </inertial>
+    </link>
+
+    <joint name="hand_to_${prefix}_finger" type="continuous">
+        <parent link="hand"/>
+        <child link="${prefix}_finger"/>
+        <origin xyz="0 0 ${handRadius}"/>
+    </joint>
+</xacro:macro>
+
+<xacro:finger prefix="right" reflect="1" />
+<xacro:finger prefix="left" reflect="-1" />
+
+<!-- joint -->
+<xacro:property name="baseOrigin" value="0 0 0" />
+<xacro:property name="elbowOrigin" value="0 0 ${upperArmLen}" />
+<xacro:property name="wistOrigin" value="0 0 ${lowerArmLen}" />
+
+<joint name="fixed" type="fixed">
+  <parent link="world"/>
+  <child link="base_link"/>
+</joint>
+
+<joint name="base" type="continuous">
+  <parent link="base_link"/>
+  <child link="upperArm"/>
+  <origin xyz="${baseOrigin}"/>
+</joint>
+
+<joint name="elbow" type="continuous">
+  <parent link="upperArm"/>
+  <child link="lowerArm"/>
+  <origin xyz="${elbowOrigin}"/>
+  <dynamics damping="11.7"/>
+</joint>
+
+<joint name="wist" type="continuous">
+  <parent link="lowerArm"/>
+  <child link="hand"/>
+  <origin xyz="${wistOrigin}"/>
+</joint>
+
+<!-- Transmission -->
+<transmission name="tran1">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="base">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="motor1">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+  <mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="tran2">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="elbow">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="motor2">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+  <mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="tran3">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="wist">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="motor3">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+  <mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="tran4">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="hand_to_right_finger">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="motor4">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+  <mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+<transmission name="tran5">
+<type>transmission_interface/SimpleTransmission</type>
+<joint name="hand_to_left_finger">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+</joint>
+<actuator name="motor5">
+  <hardwareInterface>EffortJointInterface</hardwareInterface>
+  <mechanicalReduction>1</mechanicalReduction>
+</actuator>
+</transmission>
+
+</robot>
