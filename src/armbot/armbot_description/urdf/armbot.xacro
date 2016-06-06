@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot name="armbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- Import all Gazebo-customization elements, including Gazebo colors >
+	<xacro:include filename="$(find armbot_description)/urdf/armbot.gazebo" /-->
+	<!-- Import Rviz colors -->
+	<xacro:include filename="$(find armbot_description)/urdf/materials.xacro" />
+
+	<!-- Used for fixing robot to Gazebo 'base_link' -->
+	<link name="world"/>
+
+	<joint name="fixed" type="fixed">
+		<parent link="world"/>
+		<child link="base"/>
+	</joint>
+
+	<!-- Base -->
+	<xacro:property name="mass" value="1" /> <!-- arbitrary value for mass -->
+	<xacro:property name="robotStandHeight" value="5"/>
+	<xacro:property name="baseLenght" value="1"/>
+	<xacro:property name="baseWidth" value="2"/>
+	<xacro:property name="baseHeight" value="1"/>
+
+	<link name="base">
+		<visual>
+			<origin xyz="0 0 ${robotStandHeight}" rpy="0 0 0"/>
+      		<geometry>
+				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+      		</geometry>
+      		<material name="orange"/>
+    	</visual> 
+
+		<collision>
+			<origin xyz="0 0 ${robotStandHeight}" rpy="0 0 0"/>
+      		<geometry>
+				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+      		</geometry>
+      	</collision>
+
+      	<inertial>
+      		<origin xyz="0 0 ${robotStandHeight}" rpy="0 0 0"/>
+      		<mass value="${mass}"/> 
+      		<inertia
+				ixx="1" ixy="0.0" ixz="0.0"
+				iyy="1" iyz="0.0"
+				izz="1"/>
+		</inertial>
+	</link> 
+
+	<joint name="shoulder" type = "continuous">
+		<parent link="base"/>
+		<child link="upperArm"/>
+		<origin xyz="0 ${baseWidth} ${robotStandHeight}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- upperArm -->
+	<xacro:property name="upperLenght" value="1"/>
+	<xacro:property name="upperWidth" value="3"/>
+	<xacro:property name="upperHeight" value="1"/>
+
+	<link name = "upperArm">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+      		</geometry>
+      		<material name="black"/>
+    	</visual> 
+
+    	<collision>
+    		<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+      		</geometry>
+      	</collision>
+
+      	<inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="${mass}"/>
+      		<inertia
+				ixx="1" ixy="0.0" ixz="0.0"
+				iyy="1" iyz="0.0"
+				izz="1"/>
+		</inertial>
+	</link>
+
+
+</robot>
+
