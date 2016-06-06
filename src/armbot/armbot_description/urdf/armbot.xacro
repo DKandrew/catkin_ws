@@ -17,9 +17,9 @@
 	<!-- Base -->
 	<xacro:property name="mass" value="1" /> <!-- arbitrary value for mass -->
 	<xacro:property name="robotStandHeight" value="5"/>
-	<xacro:property name="baseLenght" value="1"/>
-	<xacro:property name="baseWidth" value="2"/>
-	<xacro:property name="baseHeight" value="1"/>
+	<xacro:property name="baseLenght" value="0.8"/>
+	<xacro:property name="baseWidth" value="1.6"/>
+	<xacro:property name="baseHeight" value="0.8"/>
 
 	<link name="base">
 		<visual>
@@ -47,35 +47,36 @@
 		</inertial>
 	</link> 
 
-	<joint name="shoulder" type = "continuous">
+	<joint name="shoulder" type="continuous">
 		<parent link="base"/>
 		<child link="upperArm"/>
-		<origin xyz="0 ${baseWidth} ${robotStandHeight}" rpy="0 0 0"/>
+		<origin xyz="0 ${baseWidth/2+upperWidth/2} ${robotStandHeight}" rpy="0 0 0"/>
+		<axis xyz="0 1 0"/>
 	</joint>
 
 	<!-- upperArm -->
-	<xacro:property name="upperLenght" value="1"/>
-	<xacro:property name="upperWidth" value="3"/>
-	<xacro:property name="upperHeight" value="1"/>
+	<xacro:property name="upperLenght" value="0.8"/>
+	<xacro:property name="upperWidth" value="0.8"/>
+	<xacro:property name="upperHeight" value="2"/>
 
 	<link name = "upperArm">
 		<visual>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<origin xyz="0 0 ${-upperHeight/2}" rpy="0 0 0"/>
 			<geometry>
-				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+				<box size="${upperLenght} ${upperWidth} ${upperHeight}"/>
       		</geometry>
       		<material name="black"/>
     	</visual> 
 
     	<collision>
-    		<origin xyz="0 0 0" rpy="0 0 0"/>
+    		<origin xyz="0 0 ${-upperHeight/2}" rpy="0 0 0"/>
 			<geometry>
-				<box size="${baseLenght} ${baseWidth} ${baseHeight}"/>
+				<box size="${upperLenght} ${upperWidth} ${upperHeight}"/>
       		</geometry>
       	</collision>
 
       	<inertial>
-      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<origin xyz="0 0 ${-upperHeight/2}" rpy="0 0 0"/>
       		<mass value="${mass}"/>
       		<inertia
 				ixx="1" ixy="0.0" ixz="0.0"
@@ -84,6 +85,81 @@
 		</inertial>
 	</link>
 
+	<joint name="elbow" type="continuous">
+		<parent link="upperArm"/>
+		<child link="lowerArm"/>
+		<origin xyz="0 0 ${-upperHeight}" rpy="0 0 0"/>
+		<axis xyz="0 1 0"/>
+	</joint>
+
+	<!-- lowerArm -->
+	<xacro:property name="lowerLenght" value="0.8"/>
+	<xacro:property name="lowerWidth" value="0.8"/>
+	<xacro:property name="lowerHeight" value="1.8"/>
+
+	<link name = "lowerArm">
+		<visual>
+			<origin xyz="0 0 ${-lowerHeight/2}" rpy="0 0 0"/>
+			<geometry>
+				<box size="${lowerLenght} ${lowerWidth} ${lowerHeight}"/>
+      		</geometry>
+      		<material name="orange"/>
+      	</visual>
+
+      	<collision>
+      		<origin xyz="0 0 ${-lowerHeight/2}" rpy="0 0 0"/>
+			<geometry>
+				<box size="${lowerLenght} ${lowerWidth} ${lowerHeight}"/>
+      		</geometry>
+      	</collision>
+
+      	<inertial>
+      		<origin xyz="0 0 ${-lowerHeight/2}" rpy="0 0 0"/>
+      		<mass value="${mass}"/>
+      		<inertia
+				ixx="1" ixy="0.0" ixz="0.0"
+				iyy="1" iyz="0.0"
+				izz="1"/>
+		</inertial>
+	</link>
+
+	<joint name="wist" type="continuous">
+		<parent link="lowerArm"/>
+		<child link="hand"/>
+		<origin xyz="0 0 ${-lowerHeight}" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<!-- Hand -->
+	<xacro:property name="handLenght" value="0.5"/>
+	<xacro:property name="handWidth" value="0.5"/>
+	<xacro:property name="handHeight" value="0.5"/>
+
+	<link name="hand">
+		<visual>
+			<origin xyz="0 0 ${-handHeight/2}" rpy="0 0 0"/>
+			<geometry>
+				<box size="${handLenght} ${handWidth} ${handHeight}"/>
+			</geometry>
+			<material name="black"/>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 ${-handHeight/2}" rpy="0 0 0"/>
+			<geometry>
+				<box size="${handLenght} ${handWidth} ${handHeight}"/>
+			</geometry>
+		</collision>
+
+		<inertial>
+      		<origin xyz="0 0 ${-handHeight/2}" rpy="0 0 0"/>
+      		<mass value="${mass}"/>
+      		<inertia
+				ixx="1" ixy="0.0" ixz="0.0"
+				iyy="1" iyz="0.0"
+				izz="1"/>
+		</inertial>
+	</link>
 
 </robot>
 
