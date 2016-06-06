@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot name="armbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-	<!-- Import all Gazebo-customization elements, including Gazebo colors >
-	<xacro:include filename="$(find armbot_description)/urdf/armbot.gazebo" /-->
+	<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+	<xacro:include filename="$(find armbot_description)/urdf/armbot.gazebo" />
 	<!-- Import Rviz colors -->
 	<xacro:include filename="$(find armbot_description)/urdf/materials.xacro" />
 
@@ -55,8 +55,8 @@
 	</joint>
 
 	<!-- upperArm -->
-	<xacro:property name="upperLenght" value="0.8"/>
-	<xacro:property name="upperWidth" value="0.8"/>
+	<xacro:property name="upperLenght" value="0.5"/>
+	<xacro:property name="upperWidth" value="0.5"/>
 	<xacro:property name="upperHeight" value="2"/>
 
 	<link name = "upperArm">
@@ -93,8 +93,8 @@
 	</joint>
 
 	<!-- lowerArm -->
-	<xacro:property name="lowerLenght" value="0.8"/>
-	<xacro:property name="lowerWidth" value="0.8"/>
+	<xacro:property name="lowerLenght" value="0.5"/>
+	<xacro:property name="lowerWidth" value="0.5"/>
 	<xacro:property name="lowerHeight" value="1.8"/>
 
 	<link name = "lowerArm">
